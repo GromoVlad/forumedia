@@ -1,0 +1,57 @@
+div.registration {
+    display: flex;
+    justify-content: center;
+    font-size: 1.0rem;
+    align-items: flex-start;
+
+}
+
+form.reg {
+    display: grid;
+    width: 40%;
+    justify-items: center;
+}
+
+form.reg input {
+    font-size: 1.0rem;
+    margin: 0.3rem;
+    padding: 0.5rem;
+}
+
+form.reg input.submit {
+    width: 100%;
+}
+
+p.reg_error {
+    color: red;
+    margin: 0.5rem;
+}
+
+a.reg_a {
+    color: rgb(15, 128, 119);
+    font-weight: bold;
+}
+
+form.reg h3.reg_h3 {
+    font-family: Merriweather, sans-serif;
+    margin-top: 1.0rem;
+    margin-bottom: 1.5rem;
+}
+
+div.alert-success {
+    margin-top: 10rem;
+    font-family: Merriweather, sans-serif;
+    font-size: 1.8rem;
+    padding: 6rem 4rem;
+    text-align: center;
+}
+
+.custom-file-label {
+    padding: 0.5rem;
+    color: rgb(108, 117, 125);
+}
+
+label.custom-file-label::after {
+    content: 'Загрузить';
+}
+

@@ -1,0 +1,15 @@
+
+footer h4 {
+    text-align: center;
+    margin: 2rem;
+    font-family: Merriweather, sans-serif;
+
+}
+
+footer h4 a:hover {
+    color: rgb(102, 45, 75);
+}
+
+footer {
+    flex: 0 0 auto;
+}

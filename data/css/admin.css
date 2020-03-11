@@ -1,0 +1,218 @@
+.flex-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.flex-rows {
+    flex-basis: 100%;
+}
+
+.ul_sortable {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.ul_sortable li {
+    margin: 1.5px;
+    background-color: #BBDEFB;
+    border-radius: 3px;
+    padding: 3px 1px;
+    color: #555;
+}
+
+li.li-highlight {
+    background-color: #DCEDC8;
+    height: 1.5em;
+    line-height: 1.2em;
+}
+
+ul.users_ul {
+    display: grid;
+    grid-template-columns: 0.5fr 1.5fr 2fr 2.5fr 2fr 2fr 2fr 4fr;
+    padding: 0;
+    list-style-type: none;
+}
+
+ul.users_ul li {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+}
+
+ul.users_ul li button.btn {
+    font-size: 0.7rem;
+}
+
+ul.user_ul {
+    display: grid;
+    grid-template-columns: 4fr 4fr 4fr 4fr 2fr;
+    padding: 0;
+    list-style-type: none;
+}
+
+div.head_table {
+    display: grid;
+    grid-template-columns: 0.5fr 1.5fr 2fr 2.5fr 2fr 2fr 2fr 4fr;
+    padding: 0;
+    width: 99.4%;
+    margin: 0 0.3%;
+    background-color: #BBDEFB;
+    border-radius: 5px;
+}
+
+div.head_table h5 {
+    font-family: Merriweather, sans-serif;
+    padding: 0.5rem 0.1rem;
+    margin: 0;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+div.head_edit_table {
+    display: grid;
+    grid-template-columns: 4fr 4fr 4fr 4fr 2fr;
+    padding: 0;
+    width: 99.4%;
+    margin: 0 0.3%;
+    background-color: #BBDEFB;
+    border-radius: 5px;
+}
+
+div.head_edit_table h5 {
+    font-family: Merriweather, sans-serif;
+    padding: 0.5rem 1.5rem;
+    margin: 0;
+}
+
+h3.list_users {
+    text-align: center;
+    margin: 1rem;
+    font-family: Merriweather, sans-serif;
+    margin-top: 1.5rem;
+    margin-bottom: 2.0rem;
+}
+
+h3.edit_user {
+    margin: 1rem;
+    font-family: Merriweather, sans-serif;
+}
+
+form.reg {
+    display: grid;
+    width: 100%;
+    justify-items: center;
+}
+
+form.reg input {
+    font-size: 1.0rem;
+    margin: 0.3rem;
+    padding: 0.5rem;
+}
+
+form.reg input.submit {
+    width: 100%;
+}
+
+p.reg_error {
+    color: red;
+    margin: 0.5rem;
+}
+
+a.reg_a {
+    color: rgb(15, 128, 119);
+    font-weight: bold;
+}
+
+form.reg h3.reg_h3 {
+    font-family: Merriweather, sans-serif;
+    margin-top: 1.0rem;
+    margin-bottom: 1.5rem;
+}
+
+label.head_table-label {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    font-weight: bolder;
+}
+
+span.arrow {
+    font-size: 1.5rem;
+    opacity: 0;
+    display: flex;
+    align-items: center;
+}
+
+input.sort {
+    display: none;
+}
+
+label {
+    margin: 0;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+}
+
+.pagination .link {
+    margin: 0.2rem;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid black;
+    background-color: #BBDEFB;
+}
+
+.symbol {
+    padding: 0rem 0.6rem;
+    border-right: 1px solid black;
+}
+
+.surname_filter {
+    margin: 0.5rem 0.4rem;
+}
+
+.input_radio {
+    margin: 0.2rem 0.5rem;
+    display: flex;
+
+    align-items: center;
+}
+
+.input_radio input {
+    width: 1.3rem;
+    height: 1.3rem;
+    margin: 0 0.5rem;
+}
+
+.table td, .table th {
+    vertical-align: inherit;
+}
+
+.status {
+    padding: 0rem 0.6rem;
+    border-right: 1px solid black;
+}
+
+.status_filter {
+    margin: 0.5rem 0.4rem;
+}
+
+.active {
+    display: flex;
+    width: 100%;
+    align-items: center;
+}
+
+.club {
+    display: flex;
+    width: 100%;
+    align-items: center;
+}
+
+.image {
+    width: 400px;
+}
