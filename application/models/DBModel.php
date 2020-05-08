@@ -1,39 +1,37 @@
 <?php
 
+namespace Application\Models;
+
+use Config\Config;
+use PDO;
+
 class DBModel
 {
-    private static $_instance = null;
+    private static $instance = null;
 
     private function __construct()
     {
-        $config = new Config();
-        $dsn = 'mysql:host=' . $config::HOST_DB . ';dbname=' . $config::NAME_DB . ';charset=utf8';
-        $this->_instance = new PDO ($dsn, $config::LOGIN_DB, $config::PASS_DB);
+        $dsn = 'mysql:host=' . Config::HOST_DB . ';dbname=' . Config::NAME_DB . ';charset=utf8';
+        self::$instance = new PDO ($dsn, Config::LOGIN_DB, Config::PASS_DB);
     }
 
     public static function getInstance()
     {
-        if (self::$_instance != null) {
-            return self::$_instance;
+        if (self::$instance != null) {
+            return self::$instance;
         }
         return new self;
     }
 
-    public function __destruct()
-    {
-        $this->_instance = null;
-    }
-
     public function queryDB($sql, $category = false)
     {
-        $stmt = $this->_instance->prepare($sql);
+        $stmt = self::$instance->prepare($sql);
         if (!$category) {
             $stmt->execute();
         } else {
             $stmt->execute($category);
         }
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        return $result;
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     private function __clone()

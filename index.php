@@ -1,23 +1,22 @@
 <?php
-/* Пути по-умолчанию для поиска файлов */
-set_include_path(get_include_path() . PATH_SEPARATOR . 'application/controllers' .
-                PATH_SEPARATOR . 'application/models' . PATH_SEPARATOR . 'application/views' .
-                PATH_SEPARATOR . 'config' . PATH_SEPARATOR . 'data/mailer');
+
+use Application\Controllers\FrontController;
+
+/* Подключаем автозагрузчик */
+require_once __DIR__ . '/vendor/autoload.php';
 
 /* Имена файлов: views */
-const INDEX_PAGE = 'title.php';
-const LOGIN_PAGE = 'login.php';
-const REG_PAGE = 'registration.php';
-const REG_SUCCESSFUL_PAGE = 'successful_registration.php';
-const ADMIN_PAGE = 'admin.php';
-const SHOW_USER_PAGE = 'show_user.php';
-const ADMIN_EDIT_USER_PAGE = 'edit_admin.php';
-const EDIT_USER_PAGE = 'edit_user.php';
-
-/* Автозагрузчик классов */
-spl_autoload_register(function ($class) {
-    require_once($class . '.php');
-});
+define('INDEX_PAGE', __DIR__ . '\Application\Views\title.php');
+define('TWO_PAGE', __DIR__ . '\Application\Views\two.php');
+define('NOT_FOUND_PAGE', __DIR__ . '\Application\Views\ErrorViews\404.php');
+define('DEVELOP_PAGE', __DIR__ . '\Application\Views\ErrorViews\develop.php');
+define('LOGIN_PAGE', __DIR__ . '\Application\Views\login.php');
+define('REG_PAGE', __DIR__ . '\Application\Views\registration.php');
+define('REG_SUCCESSFUL_PAGE', __DIR__ . '\Application\Views\successful_registration.php');
+define('ADMIN_PAGE', __DIR__ . '\Application\Views\admin.php');
+define('SHOW_USER_PAGE', __DIR__ . '\Application\Views\show_user.php');
+define('ADMIN_EDIT_USER_PAGE', __DIR__ . '\Application\Views\edit_admin.php');
+define('EDIT_USER_PAGE', __DIR__ . '\Application\Views\edit_user.php');
 
 /* Инициализация и запуск FrontController */
 $front = FrontController::getInstance();

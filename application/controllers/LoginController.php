@@ -1,39 +1,43 @@
 <?php
 
+namespace Application\Controllers;
+
+use Application\Models\LoginModel;
+use Config\Config;
+
 class LoginController implements IController
 {
     public $path;
+    private $model;
+    private $fc;
 
     public function __construct()
     {
-        $config = new Config();
-        $this->path = $config::APP_URL;
+        $this->path = Config::APP_URL;
+        $this->fc = FrontController::getInstance();
+        $this->model = new LoginModel();
     }
 
     public function indexAction()
     {
         session_start();
-        $fc = FrontController::getInstance();
-        $model = new LoginModel();
         if (!empty($_SESSION['login']['user_login'])) {
             header('Location: ' . $this->path, true, 301);
         } else {
-            $output = $model->render(LOGIN_PAGE);
-            $fc->setBody($output);
+            $output = $this->model->render(LOGIN_PAGE);
+            $this->fc->setBody($output);
         }
     }
 
     public function entryAction()
     {
         session_start();
-        $fc = FrontController::getInstance();
-        $model = new LoginModel();
-        $model->verificationLogin($_POST);
+        $this->model->verificationLogin($_POST);
         if (!empty($_SESSION['login']['user_login'])) {
             header('Location: ' . $this->path, true, 301);
         } else {
-            $output = $model->render(LOGIN_PAGE);
-            $fc->setBody($output);
+            $output = $this->model->render(LOGIN_PAGE);
+            $this->fc->setBody($output);
         }
     }
 

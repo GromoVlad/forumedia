@@ -1,5 +1,9 @@
 <?php
 
+namespace Application\Models;
+
+use Config\Config;
+
 class HeaderModel
 {
     public $path;
@@ -7,8 +11,7 @@ class HeaderModel
 
     public function __construct()
     {
-        $config = new Config();
-        $this->path = $config::APP_URL;
+        $this->path = Config::APP_URL;
     }
 
     public function getMenu()

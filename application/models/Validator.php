@@ -1,61 +1,49 @@
 <?php
 
+namespace Application\Models;
+
+use PDO;
+
 class Validator
 {
     const MIN_LENGTH_LOGIN = 5;
     const MIN_LENGTH_PASSWORD = 6;
     const MIN_LENGTH_NAME = 3;
     const MIN_LENGTH_SURNAME = 3;
+    private $request;
 
     public function __construct($request)
     {
-        $this->connectDB = DBModel::getInstance(); // подключение к БД
         $this->clearErrorBuffer();
         $this->request = $request;
     }
 
     public function validationBeforeCreation() // валидация всех полей при регистрации нового пользователя
     {
-        $this->clearErrorBuffer(); // очищаем сессии от старых ошибок
-        $this->loginNoEmpty()->checkLengthLogin()->findLoginInDatabase(); //проверка поля логин
-        $this->passwordNoEmpty()->checkLengthPassword()->passwordEquality(); //проверка поля пароль
-        $this->checkEmail(); //проверка поля e-mail
-        $this->checkLengthName(); //проверка поля name
-        $this->checkLengthSurname(); //проверка поля surname
-        $this->checkPhone(); //проверка поля phone
+        $this->clearErrorBuffer()->loginNoEmpty()->checkLengthLogin()->findLoginInDatabase()->passwordNoEmpty()
+            ->checkLengthPassword()->passwordEquality()->checkEmail()->checkLengthName()->checkLengthSurname()
+            ->checkPhone();
     }
 
-    // валидация для класса AdminModel, при редактирование данных администратором
-    public function validationBeforeUpdateAdmin($id)  //adminCheckBeforeUpdate
+    public function validationBeforeUpdateAdmin($id) // валидация в классу AdminModel, при редакт-нии данных админом
     {
-        $renameLogin = $this->getLogin($id) === $this->request['login'] ? false : true;  // нужна ли проверка на уникальность логина?
-        $this->clearErrorBuffer(); // очищаем сессии от старых ошибок
-        $this->loginNoEmpty()->checkLengthLogin(); //проверка поля логин
-        if ($renameLogin) { //проверка нового логина на уникальность
+        $this->clearErrorBuffer()->loginNoEmpty()->checkLengthLogin()->checkEmail()->checkLengthName()
+            ->checkLengthSurname()->checkPhone();
+        if ($this->getLogin($id) !== $this->request['login']) { //проверка нового логина на уникальность
             $this->findLoginInDatabase();
         }
-        $this->checkEmail(); //проверка поля e-mail
-        $this->checkLengthName(); //проверка поля name
-        $this->checkLengthSurname(); //проверка поля surname
-        $this->checkPhone(); //проверка поля phone
     }
 
-    // валидация для класса IndexModel, при редактирование данных пользователем
-    public function validationBeforeUpdateUser($id)
+    public function validationBeforeUpdateUser($id) // валидация в классе IndexModel, при редакт-нии данных юзером
     {
-        $renameLogin = $this->getLogin($id) === $this->request['login'] ? false : true;  // нужна ли проверка на уникальность логина?
-        $this->clearErrorBuffer(); // очищаем сессии от старых ошибок
-        $this->loginNoEmpty()->checkLengthLogin(); //проверка поля логин
-        if ($renameLogin) { //проверка нового логина на уникальность
+        $this->clearErrorBuffer()->loginNoEmpty()->checkLengthLogin()->checkEmail()->checkLengthName()
+            ->checkLengthSurname()->checkPhone();
+        if ($this->getLogin($id) !== $this->request['login']) { //проверка нового логина на уникальность
             $this->findLoginInDatabase();
         }
         if (!empty($this->request['password'])) {
             $this->checkLengthPassword(); //проверка поля пароль
         }
-        $this->checkEmail(); //проверка поля e-mail
-        $this->checkLengthName(); //проверка поля name
-        $this->checkLengthSurname(); //проверка поля surname
-        $this->checkPhone(); //проверка поля phone
     }
 
     private function loginNoEmpty()
@@ -80,7 +68,7 @@ class Validator
         $sql = "SELECT login FROM clients WHERE id = ?";
         $category = [];
         $category[] = $id;
-        $login = $this->connectDB->queryDB($sql, $category);
+        $login = $this->queryDB($sql, $category);
         return $login[0]['login'];
     }
 
@@ -89,7 +77,8 @@ class Validator
         $category = [];
         $sql = "SELECT login FROM clients WHERE login = ? LIMIT 1";
         $category[] = $this->request['login'];
-        $foundLogin = $this->connectDB->queryDB($sql, $category);
+        /* Не понимаю почему перестал работать $foundLogin = $this->connectDB->queryDB($sql, $category);, заменил на код из DBModel */
+        $foundLogin = $this->queryDB($sql, $category);
         if (!empty($foundLogin)) {
             $_SESSION['reg']['errors'][] = 'Данный пользователь уже зарегистрирован в системе';
         }
@@ -127,6 +116,7 @@ class Validator
         if (empty($this->request['email'])) {
             $_SESSION['reg']['errors'][] = 'Не указан e-mail';
         }
+        return $this;
     }
 
     private function checkLengthName()
@@ -137,6 +127,7 @@ class Validator
                 $_SESSION['reg']['errors'][] = 'Слишком короткое имя';
             }
         }
+        return $this;
     }
 
     private function checkLengthSurname()
@@ -147,6 +138,7 @@ class Validator
                 $_SESSION['reg']['errors'][] = 'Слишком короткая фамилия';
             }
         }
+        return $this;
     }
 
     private function checkPhone()
@@ -154,10 +146,23 @@ class Validator
         if (empty($this->request['phone'])) {
             $_SESSION['reg']['errors'][] = 'Не указан телефон';
         }
+        return $this;
     }
 
     public function clearErrorBuffer()
     {
         unset($_SESSION['reg']['errors']);
+        return $this;
+    }
+
+    private function queryDB($sql, $category = false)
+    {
+        $stmt = DBModel::getInstance()->prepare($sql);
+        if (!$category) {
+            $stmt->execute();
+        } else {
+            $stmt->execute($category);
+        }
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

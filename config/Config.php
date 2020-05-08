@@ -1,12 +1,15 @@
 <?php
 
+namespace Config;
+
 class Config
 {
     const HOST_DB = 'localhost';
     const LOGIN_DB = 'root';
-    const PASS_DB = '123';
+    const PASS_DB = 'root';
     const NAME_DB = 'forumedia';
-    const APP_URL = 'http://localhost/';
+    const APP_URL = 'http://forumedia/';
+    const DEBUG_MODE = false;
     const RECORDS_IN_PAGE = 10;
     const EMAIL_ADMIN = 'uniquesitemailtest@gmail.com';
     const EMAIL_ADMIN_LOGIN = 'uniquesitemailtest'; // логин на почте

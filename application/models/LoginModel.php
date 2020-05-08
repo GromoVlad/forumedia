@@ -1,17 +1,22 @@
 <?php
 
+namespace Application\Models;
+
+use Config\Config;
+
 class LoginModel
 {
     const TITLE = 'Вход/регистрация';
     const CSS = 'login';
     public $path;
+    private $connectDB;
+    private $header;
 
     public function __construct()
     {
         $this->connectDB = DBModel::getInstance(); // подключение к БД
         $this->header = new HeaderModel;
-        $config = new Config();
-        $this->path = $config::APP_URL;
+        $this->path = Config::APP_URL;
     }
 
     public function render($file) // $file - текущее представление

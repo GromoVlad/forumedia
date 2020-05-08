@@ -1,25 +1,33 @@
 <?php
 
+namespace Application\Controllers;
+
+use Application\Exception\ErrorHandler;
+use Exception;
+use ReflectionClass;
+
 class FrontController
 {
-    protected $_controller, $_action, $_params, $_body;
-    static $_instance;
+    protected $controller, $action, $params, $body;
+    static $instance;
 
     public static function getInstance()
     {
-        if (!(self::$_instance instanceof self)) {
-            self::$_instance = new self();
+        if (!(self::$instance instanceof self)) {
+            self::$instance = new self();
         }
-        return self::$_instance;
+        return self::$instance;
     }
 
     private function __construct()
     {
         $request = $_SERVER['REQUEST_URI'];
-        $splits = explode('/', trim($request, '/')); //Какой сontroller использовать?
-        $this->_controller = !empty($splits[0]) ? ucfirst($splits[0]) . 'Controller' : 'IndexController'; //Какой action использовать?
-        $this->_action = !empty($splits[1]) ? $splits[1] . 'Action' : 'indexAction'; //Есть ли параметры и их значения?
-        if (!empty($splits[2])) {
+        $splits = explode('/', trim($request, '/'));
+        //Какой сontroller использовать?
+        $this->controller = !empty($splits[0]) ? 'Application\\Controllers\\' . ucfirst($splits[0]) . 'Controller' : 'Application\\Controllers\\IndexController';
+        //Какой action использовать?
+        $this->action = !empty($splits[1]) ? $splits[1] . 'Action' : 'indexAction';
+        if (!empty($splits[2])) { //Есть ли параметры и их значения?
             $keys = $values = [];
             for ($i = 2, $cnt = count($splits); $i < $cnt; $i++) {
                 if ($i % 2 == 0) { //Чётное = ключ (параметр)
@@ -28,7 +36,7 @@ class FrontController
                     $values[] = $splits[$i];
                 }
             }
-            @$this->_params = array_combine($keys, $values);
+            @$this->params = array_combine($keys, $values);
         }
     }
 
@@ -36,44 +44,44 @@ class FrontController
     {
         if (class_exists($this->getController())) {
             $rc = new ReflectionClass($this->getController());
-            if ($rc->implementsInterface('IController')) {
+            if ($rc->implementsInterface('Application\\Controllers\\IController')) {
                 if ($rc->hasMethod($this->getAction())) {
                     $controller = $rc->newInstance();
                     $method = $rc->getMethod($this->getAction());
                     $method->invoke($controller);
                 } else {
-                    throw new Exception("Action");
+                    throw ErrorHandler::delegate('У контроллера <b>"' . $this->getController() . '"</b> нет метода <b>"' . $this->getAction() . '"</b>');
                 }
             } else {
-                throw new Exception("Interface");
+                throw ErrorHandler::delegate('Контроллер <b>"' . $this->getController() . '"</b> не реализует интерфейс IController');
             }
         } else {
-            throw new Exception("Controller");
+            throw ErrorHandler::delegate('Простанства имен <b>"' . $this->getController() . '"</b> не существует среди контроллеров');
         }
     }
 
     public function getParams()
     {
-        return $this->_params;
+        return $this->params;
     }
 
     public function getController()
     {
-        return $this->_controller;
+        return $this->controller;
     }
 
     public function getAction()
     {
-        return $this->_action;
+        return $this->action;
     }
 
     public function getBody()
     {
-        return $this->_body;
+        return $this->body;
     }
 
     public function setBody($body)
     {
-        $this->_body = $body;
+        $this->body = $body;
     }
 }

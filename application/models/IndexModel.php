@@ -1,17 +1,22 @@
 <?php
 
+namespace Application\Models;
+
+use Config\Config;
+
 class IndexModel
 {
     const TITLE = 'Список пользователей';
     const CSS = 'index';
     public $path;
+    private $connectDB;
+    private $header;
 
     public function __construct()
     {
         $this->connectDB = DBModel::getInstance(); // подключение к БД
         $this->header = new HeaderModel();
-        $config = new Config();
-        $this->path = $config::APP_URL;
+        $this->path = Config::APP_URL;
     }
 
     public function render($file)
@@ -23,19 +28,16 @@ class IndexModel
 
     public function getDataUser()
     {
-        $sql = "SELECT id, login, email, name, surname,  phone, image, address, date_create, date_update, active, 
-                club_type FROM clients WHERE id = ?";
+        $sql = "SELECT id, login, email, name, surname,  phone, image, address, date_create, 
+                date_update, active, club_type FROM clients WHERE id = ?";
         $category = [];
         $category[] = $_SESSION['login']['id'];
-        $result = $this->connectDB->queryDB($sql, $category);
-        return $result;
+        return $this->connectDB->queryDB($sql, $category);
     }
 
     public function updateUser()
     {
-        $id = $_SESSION['login']['id'];
-        $validator = new Validator($_POST);
-        $validator->validationBeforeUpdateUser($id); // валидация всех полей
+        (new Validator($_POST))->validationBeforeUpdateUser($_SESSION['login']['id']); // валидация всех полей
         if (empty($_SESSION['reg']['errors'])) {
             if (empty($_POST['password'])) {
                 $sql = "UPDATE `clients` SET login = ?, email = ?, name = ?, surname = ?, phone = ?, 
@@ -44,8 +46,7 @@ class IndexModel
                 $sql = "UPDATE `clients` SET login = ?, password = ?, email = ?, name = ?, surname = ?, phone = ?, 
                         image = ?, address = ?, date_update = ? WHERE id = ?";
             }
-            $preparingDataSQL = new PreparingDataSQL($_POST, $_FILES);
-            $category = $preparingDataSQL->generateDataBeforeUpdatingUser($id); // подготавливаем данные для передачи в БД
+            $category = (new PreparingDataSQL($_POST, $_FILES))->generateDataBeforeUpdatingUser($_SESSION['login']['id']); // подготавливаем данные для передачи в БД
             $this->connectDB->queryDB($sql, $category);
             return true;
         }

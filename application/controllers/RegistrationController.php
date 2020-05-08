@@ -1,36 +1,40 @@
 <?php
 
+namespace Application\Controllers;
+
+use Application\Models\RegistrationModel;
+use Config\Config;
+
 class RegistrationController implements IController
 {
     public $path;
+    private $model;
+    private $fc;
 
     public function __construct()
     {
-        $config = new Config();
-        $this->path = $config::APP_URL;
+        $this->path = Config::APP_URL;
+        $this->fc = FrontController::getInstance();
+        $this->model = new RegistrationModel($_POST, $_FILES);
     }
 
     public function indexAction()
     {
         session_start();
-        $fc = FrontController::getInstance();
-        $model = new RegistrationModel();
-        $output = $model->render(REG_PAGE);
-        $fc->setBody($output);
+        $output = $this->model->render(REG_PAGE);
+        $this->fc->setBody($output);
     }
 
     public function createAction()
     {
         session_start();
-        $fc = FrontController::getInstance();
-        $model = new RegistrationModel($_POST, $_FILES);
-        if ($model->createUser()) {
+        if ($this->model->createUser()) {
             header('Refresh: 5; url=' . $this->path . 'login/');
-            $output = $model->render(REG_SUCCESSFUL_PAGE);
-            $fc->setBody($output);
+            $output = $this->model->render(REG_SUCCESSFUL_PAGE);
+            $this->fc->setBody($output);
         } else {
-            $output = $model->render(REG_PAGE);
-            $fc->setBody($output);
+            $output = $this->model->render(REG_PAGE);
+            $this->fc->setBody($output);
         }
     }
 }

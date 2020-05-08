@@ -1,5 +1,9 @@
 <?php
 
+namespace Application\Models;
+
+use Config\Config;
+
 class AdminModel
 {
     const TITLE = 'Панель администратора';
@@ -7,14 +11,15 @@ class AdminModel
     public $path;
     public $params;
     private $recordsInPage;
+    private $connectDB;
+    private $header;
 
     public function __construct()
     {
         $this->connectDB = DBModel::getInstance(); // подключение к БД
         $this->header = new HeaderModel;
-        $config = new Config();
-        $this->path = $config::APP_URL;
-        $this->recordsInPage = $config::RECORDS_IN_PAGE;
+        $this->path = Config::APP_URL;
+        $this->recordsInPage = Config::RECORDS_IN_PAGE;  // убрать
     }
 
     public function render($file)
@@ -26,7 +31,7 @@ class AdminModel
 
     public function getUsers()
     {
-        $from = empty($this->params['page']) ? 0 : (($this->params['page'] - 1) * $this->recordsInPage);
+        $from = empty($this->params['page']) ? 0 : (($this->params['page'] - 1) * Config::RECORDS_IN_PAGE);
         $notesOnPage = $this->recordsInPage;
         $sql = "SELECT id, login, name, surname, email, date_create, active, club_type FROM clients WHERE 1=1";
         if (isset($this->params['status'])) {
@@ -38,29 +43,18 @@ class AdminModel
             $sql .= " AND surname LIKE '$symbol%' ";
         }
         $sql .= " LIMIT $from, $notesOnPage";
-        $result = $this->connectDB->queryDB($sql);
-        return $result;
+        return $this->connectDB->queryDB($sql);
     }
 
     public function updateUser()
     {
-        $id = $this->params['id'];
-        $validator = new Validator($_POST);
-        $validator->validationBeforeUpdateAdmin($id); // валидация
+        (new Validator($_POST))->validationBeforeUpdateAdmin($this->params['id']); // валидация
         if (empty($_SESSION['reg']['errors'])) {
-            $preparingDataSQL = new PreparingDataSQL($_POST, $_FILES);
-            $category = $preparingDataSQL->generateDataBeforeUpdatingAdmin($id);  // подготавливаем данные для передачи в БД
+            $category = (new PreparingDataSQL($_POST, $_FILES))->generateDataBeforeUpdatingAdmin($this->params['id']);  // подготавливаем данные для передачи в БД
             $sql = "UPDATE `clients` SET login = ?, email = ?, name = ?, surname = ?, phone = ?, image = ?, 
-            address = ?, date_update = ?, active = ?, club_type = ? WHERE id = ?";
-            $needEmail = $this->changeActive($id) == $category[8] ? false : true; // проверяем изменился ли статус активности?
+                    address = ?, date_update = ?, active = ?, club_type = ? WHERE id = ?";
             $this->connectDB->queryDB($sql, $category);
-            // отправляем письмо пользователю о изменении его статуса администратором
-            if ($needEmail) {
-                $mail = new Mailer($_POST);
-                $mail->sendMailChangeActive($category[8], $category[1]);
-            }
             return true;
-
         }
         return false;
     }
@@ -74,7 +68,6 @@ class AdminModel
         return $result[0]['active'];
     }
 
-
     public function deleteUser()
     {
         $id = $this->params['id'];
@@ -86,15 +79,12 @@ class AdminModel
 
     public function createUser()
     {
-        $validator = new Validator($_POST);
-        $validator->validationBeforeCreation(); // валидация всех полей
+        (new Validator($_POST))->validationBeforeCreation(); // валидация всех полей
         if (empty($_SESSION['reg']['errors'])) {
             $sql = 'INSERT INTO `clients` (`login`, `password`, `email`, `name`, `surname`, `phone`, `image`,`address`, 
             `date_create`, `date_update`, `active`, `club_type`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-            $preparingDataSQL = new PreparingDataSQL($_POST, $_FILES);
-            $category = $preparingDataSQL->generateDataBeforeCreating();
+            $category = (new PreparingDataSQL($_POST, $_FILES))->generateDataBeforeCreating();
             $this->connectDB->queryDB($sql, $category);
-            $this->sendMail();  // отправляем письмо о успешной регистрации пользователю и администратору
             return true;
         }
         return false;
@@ -163,10 +153,9 @@ class AdminModel
     {
         $category = [];
         $category[] = $this->params['id'];
-        $sql = "SELECT id, login, password, email, name, surname, phone, image, address, date_create, date_update, 
-                active, club_type FROM clients WHERE id = ?";
-        $result = $this->connectDB->queryDB($sql, $category);
-        return $result;
+        $sql = "SELECT id, login, password, email, name, surname, phone, image, address, date_create, 
+                date_update, active, club_type FROM clients WHERE id = ?";
+        return $this->connectDB->queryDB($sql, $category);
     }
 
     public function isEmpty($data)
@@ -197,12 +186,5 @@ class AdminModel
     public function clearErrorBuffer()
     {
         unset($_SESSION['reg']['errors']);
-    }
-
-    private function sendMail() // отправляем письмо о успешной регистрации пользователю и админу
-    {
-        $mail = new Mailer($_POST);
-        $mail->sendMailUser();
-        $mail->sendMailAdmin();
     }
 }

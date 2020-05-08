@@ -1,5 +1,7 @@
 <?php
 
+namespace Application\Models;
+
 class ImageModel
 {
     public $image;

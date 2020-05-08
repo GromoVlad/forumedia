@@ -1,18 +1,37 @@
 <?php
 
+namespace Application\Models;
+
+use Config\Config;
+use PDO;
+
 class PreparingDataSQL
 {
     const MAX_WIDTH_PHOTO = 900; //px
+    private $header;
+    private $request;
+    private $file;
+    private $defaultValueActivation;
+    private $defaultValueClub;
 
     public function __construct($request, $file)
     {
-        $this->connectDB = DBModel::getInstance(); // подключение к БД
         $this->header = new HeaderModel;
         $this->request = $request;
         $this->file = $file;
-        $config = new Config();
-        $this->defaultValueActivation = $config::DEFAULT_VALUE_ACTIVATION;
-        $this->defaultValueClub = $config::DEFAULT_VALUE_CLUB;
+        $this->defaultValueActivation = Config::DEFAULT_VALUE_ACTIVATION;
+        $this->defaultValueClub = Config::DEFAULT_VALUE_CLUB;
+    }
+
+    private function queryDB($sql, $category = false)
+    {
+        $stmt = DBModel::getInstance()->prepare($sql);
+        if (!$category) {
+            $stmt->execute();
+        } else {
+            $stmt->execute($category);
+        }
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     // подготовка данных перед созданием пользователя
@@ -159,7 +178,7 @@ class PreparingDataSQL
         $sql = "SELECT image FROM clients WHERE id = ?";
         $category = [];
         $category[] = $id;
-        $image = $this->connectDB->queryDB($sql, $category);
+        $image = $this->queryDB($sql, $category);
         return $image[0]['image'];
     }
 }
